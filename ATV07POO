@@ -1,0 +1,176 @@
+Q1)
+o polimorfismo é um princípio da Programação Orientada a Objetos que permite que uma única instrução (ou método) produza resultados diferentes dependendo do objeto que a recebe.
+
+Sua principal utilização é a padronização e o reaproveitamento de código. Na prática, isso ocorre quando uma classe especializada (filha) herda uma ação de uma classe genérica (pai) e a reescreve — um processo chamado de sobrescrita — para adequá-la às suas características específicas.
+
+Q2)
+
+// --- CLASSES PAI (Base) ---
+
+class Funcionario {
+    private String nome, telefone, senha;
+    public Funcionario() {}
+    public Funcionario(String n, String t, String s) { try { nome=n; telefone=t; senha=s; } catch(Exception e) { nome=telefone=senha="Padrão"; err(); } }
+    protected void err() { System.out.println("Exceção – Valores padrões definidos"); }
+    
+    public String getNome() { return nome; } public void setNome(String n) { try{nome=n;}catch(Exception e){nome="Padrão";err();} }
+    public String getTelefone() { return telefone; } public void setTelefone(String t) { try{telefone=t;}catch(Exception e){telefone="Padrão";err();} }
+    
+    // Método base para polimorfismo
+    public void acessar() { System.out.println("Acessando sistema como funcionário genérico..."); }
+    public void mostrar() { System.out.print("Nome: " + nome + " | Tel: " + telefone); }
+}
+
+class Agenda {
+    private String data, hora;
+    public Agenda() {}
+    public Agenda(String d, String h) { try{data=d;hora=h;}catch(Exception e){data=hora="Padrão";err();} }
+    protected void err() { System.out.println("Exceção – Valores padrões definidos"); }
+    
+    public String getData() { return data; } public void setData(String d) { try{data=d;}catch(Exception e){data="Padrão";err();} }
+    public String getHora() { return hora; } public void setHora(String h) { try{hora=h;}catch(Exception e){hora="Padrão";err();} }
+    
+    // Método base para polimorfismo
+    public void consultar() { System.out.println("Consultando horário na agenda..."); }
+    public void mostrar() { System.out.print("Data: " + data + " às " + hora); }
+}
+
+class Procedimento {
+    private String data, descritivo;
+    public Procedimento() {}
+    public Procedimento(String d, String desc) { try{data=d;descritivo=desc;}catch(Exception e){data=descritivo="Padrão";err();} }
+    protected void err() { System.out.println("Exceção – Valores padrões definidos"); }
+    
+    public String getData() { return data; } 
+    public String getDescritivo() { return descritivo; }
+    
+    // Método base para polimorfismo
+    public void consultar() { System.out.println("Consultando diretrizes do procedimento..."); }
+    public void mostrar() { System.out.print("Descritivo: " + descritivo + " | Data: " + data); }
+}
+
+class Paciente {
+    private String nome, cpf, telefone, genero; private int idade;
+    public Paciente() {}
+    public Paciente(String n, String c, String t, String g, int i) { try{nome=n;cpf=c;telefone=t;genero=g;idade=i;}catch(Exception e){nome=cpf=telefone=genero="Padrão";idade=0;err();} }
+    private void err() { System.out.println("Exceção – Valores padrões definidos"); }
+    public String getNome() { return nome; }
+    public void mostrar() { System.out.println("Paciente: " + nome + " | CPF: " + cpf + " | Tel: " + telefone); }
+}
+
+
+// --- SUBCLASSES (Aplicando Polimorfismo com @Override) ---
+
+class Medico extends Funcionario {
+    private String crm, especialidade; private Receita receita; private Exame exame;
+    public Medico(String n, String t, String s, String c, String e, Receita r, Exame ex) { super(n,t,s); try{crm=c;especialidade=e;receita=r;exame=ex;}catch(Exception exc){crm=especialidade="Padrão";err();} }
+    
+    @Override
+    public void acessar() { 
+        System.out.println("Médico(a) " + getNome() + " acessando portal médico via CRM..."); 
+    }
+
+    @Override
+    public void mostrar() { 
+        System.out.print("Médico - ");
+        super.mostrar(); // Reaproveita o código da classe Funcionario
+        System.out.println(" | CRM: " + crm + " | Especialidade: " + especialidade); 
+    }
+}
+
+class Recepcionista extends Funcionario {
+    private String cpf; private Paciente paciente; private Consulta consulta;
+    public Recepcionista(String n, String t, String s, String c, Paciente p, Consulta co) { super(n,t,s); try{cpf=c;paciente=p;consulta=co;}catch(Exception e){cpf="Padrão";err();} }
+    
+    @Override
+    public void acessar() { 
+        System.out.println("Recepcionista " + getNome() + " acessando painel de agendamentos..."); 
+    }
+
+    @Override
+    public void mostrar() { 
+        System.out.print("Recepcionista - ");
+        super.mostrar(); // Reaproveita o código da classe Funcionario
+        System.out.println(" | CPF: " + cpf); 
+    }
+}
+
+class Consulta extends Agenda {
+    private String motivo, historico; private Medico medico; private Paciente paciente;
+    public Consulta(String d, String h, String m, String hi, Medico me, Paciente p) { super(d,h); try{motivo=m;historico=hi;medico=me;paciente=p;}catch(Exception ex){motivo=historico="Padrão";err();} }
+    
+    @Override
+    public void consultar() {
+        System.out.println("Consultando histórico e motivo da consulta marcada...");
+    }
+
+    @Override
+    public void mostrar() { 
+        System.out.print("Consulta - ");
+        super.mostrar(); // Reaproveita o código da classe Agenda
+        System.out.println(" | Motivo: " + motivo + (medico!=null?" -> Dr(a): "+medico.getNome():"") + (paciente!=null?" -> Paciente: "+paciente.getNome():"")); 
+    }
+}
+
+class Receita extends Procedimento {
+    public Receita(String d, String desc) { super(d, desc); }
+    
+    @Override
+    public void consultar() {
+        System.out.println("Consultando dosagem e medicações na receita...");
+    }
+
+    @Override
+    public void mostrar() { 
+        System.out.print("Receita Gerada - ");
+        super.mostrar(); // Reaproveita o código da classe Procedimento
+        System.out.println();
+    }
+}
+
+class Exame extends Procedimento {
+    public Exame(String d, String desc) { super(d, desc); }
+    
+    @Override
+    public void consultar() {
+        System.out.println("Consultando preparos necessários para o exame laboratorial...");
+    }
+
+    @Override
+    public void mostrar() { 
+        System.out.print("Exame Solicitado - ");
+        super.mostrar(); // Reaproveita o código da classe Procedimento
+        System.out.println();
+    }
+}
+
+
+// --- MÉTODO PRINCIPAL ---
+
+public class SistemaClinica {
+    public static void main(String[] args) {
+        Paciente p1 = new Paciente("Carlos Eduardo", "123.456.789-00", "(11) 99999-1111", "Masculino", 35);
+        Receita rec1 = new Receita("15/11/2023", "Aspirina Prevent, 1 comprimido/dia.");
+        Exame ex1 = new Exame("15/11/2023", "Eletrocardiograma e Sangue.");
+        Medico m1 = new Medico("Dr. Roberto Silva", "(11) 98888-2222", "med123", "12345-SP", "Cardiologista", rec1, ex1);
+        Consulta c1 = new Consulta("15/11/2023", "14:30", "Dores no peito", "Histórico de hipertensão", m1, p1);
+        Recepcionista r1 = new Recepcionista("Ana Beatriz", "(11) 97777-3333", "rec123", "098.765.432-11", p1, c1);
+        
+        System.out.println("--- DEMONSTRAÇÃO DE POLIMORFISMO (Comportamentos) ---");
+        m1.acessar();
+        r1.acessar();
+        System.out.println();
+        c1.consultar();
+        rec1.consultar();
+        ex1.consultar();
+        System.out.println();
+
+        System.out.println("--- DEMONSTRAÇÃO DE POLIMORFISMO (Dados com super.mostrar) ---");
+        p1.mostrar(); 
+        m1.mostrar(); 
+        r1.mostrar(); 
+        c1.mostrar(); 
+        rec1.mostrar(); 
+        ex1.mostrar();
+    }
+}
